@@ -1,0 +1,12 @@
+E:\github\SenCom\SenCom\bin\Debug\SenCom.exe
+E:\github\SenCom\SenCom\bin\Debug\SenCom.pdb
+E:\github\SenCom\SenCom\bin\Debug\DynamicDataDisplay.dll
+E:\github\SenCom\SenCom\obj\x86\Debug\MainWindow.baml
+E:\github\SenCom\SenCom\obj\x86\Debug\MainWindow.g.cs
+E:\github\SenCom\SenCom\obj\x86\Debug\App.g.cs
+E:\github\SenCom\SenCom\obj\x86\Debug\SenCom_MarkupCompile.cache
+E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.g.resources
+E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.Properties.Resources.resources
+E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.csproj.GenerateResource.Cache
+E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.exe
+E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.pdb
