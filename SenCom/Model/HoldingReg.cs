@@ -12,7 +12,7 @@ namespace SenCom.Model
     class HoldingReg
     {
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        struct HoldingRegStruct
+        public struct HoldingRegStruct
         {
             public float sensor_value;
             public UInt16 sensor_id;
@@ -35,6 +35,22 @@ namespace SenCom.Model
             public int detect_calibration;
              
         };
+
+
+        public HoldingRegStruct m_hold_reg;
+        
+        public HoldingReg(byte[] bin, int len)
+        {
+            int size = Marshal.SizeOf(m_hold_reg);
+            IntPtr bufferPtr = Marshal.AllocHGlobal(size);
+            if (len == size)
+            {
+                Marshal.Copy(bin, 0, bufferPtr, size);
+                m_hold_reg = (HoldingRegStruct)Marshal.PtrToStructure(bufferPtr, typeof(HoldingRegStruct));
+                ChangeRegEndian();
+            }
+            
+        }
 
         private void ChangeRegEndian()
         {
@@ -61,22 +77,6 @@ namespace SenCom.Model
             Endian.SwapBit16(ref m_hold_reg.calibration_num);
             Endian.SwapBit32(ref m_hold_reg.detect_calibration);
         }
-
-        private HoldingRegStruct m_hold_reg;
-        
-        public HoldingReg(byte[] bin, int len)
-        {
-            int size = Marshal.SizeOf(m_hold_reg);
-            IntPtr bufferPtr = Marshal.AllocHGlobal(size);
-            if (len == size)
-            {
-                Marshal.Copy(bin, 0, bufferPtr, size);
-                m_hold_reg = (HoldingRegStruct)Marshal.PtrToStructure(bufferPtr, typeof(HoldingRegStruct));
-            }
-            ChangeRegEndian();
-        }
-
-        
 
     }
 }

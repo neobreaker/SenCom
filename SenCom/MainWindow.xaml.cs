@@ -17,6 +17,8 @@ using System.Timers;
 using System.Windows.Threading;
 using SenCom.Common;
 using SenCom.Model;
+using Microsoft.Research.DynamicDataDisplay;
+using Microsoft.Research.DynamicDataDisplay.DataSources;
 
 namespace SenCom
 {
@@ -31,6 +33,10 @@ namespace SenCom
         private Timer m_com_timer = null;
         private delegate void TimerDispatcherDelegate();
         private HoldingReg m_holding_reg = null;
+
+        private ObservableDataSource<Point> m_chart_display = new ObservableDataSource<Point>();
+        private ObservableDataSource<Point> m_chart_detect = new ObservableDataSource<Point>();
+        private ObservableDataSource<Point> m_chart_cfg = new ObservableDataSource<Point>();
 
         public MainWindow()
         {
@@ -63,6 +69,8 @@ namespace SenCom
         private void UIInit()
         {
             this.tbkComRevNum.Text = m_total_rcv.ToString();
+
+            this.cpSensorCfg.AddLineGraph(m_chart_cfg, Colors.Green);
         }
 
         private void SerialPortReceive(object sender, SerialDataReceivedEventArgs e)
@@ -75,7 +83,7 @@ namespace SenCom
             m_com_queue.Enqueue(rcv_buffer);
 
             m_com_timer.Stop();
-            m_com_timer.Interval = 1000;
+            m_com_timer.Interval = 100;     //min 40
             m_com_timer.Start();
             
         }
@@ -83,10 +91,34 @@ namespace SenCom
         private void ComTimedEvent(object sender, EventArgs e)
         {
             this.Dispatcher.Invoke(DispatcherPriority.Normal,
-                new TimerDispatcherDelegate(updateUI));
+                new TimerDispatcherDelegate(UpdateUI));
         }
 
-        private void updateUI()
+        private void UpdateChartDisplay(HoldingReg hr)
+        {
+
+        }
+
+        private void UpdateChartDetect(HoldingReg hr)
+        {
+
+        }
+
+        private void UpdateChartCFG(HoldingReg hr)
+        {
+            int i = 0;
+            Point point;
+
+            for (i = 0; i < hr.m_hold_reg.calibration_num; i++)
+            {
+                point = new Point(hr.m_hold_reg.detect[i], hr.m_hold_reg.display[i]);
+                m_chart_cfg.AppendAsync(base.Dispatcher, point);
+            }
+
+
+        }
+
+        private void UpdateUI()
         {
             int i = 0, rcv_len = 0;
             string rcv_str = "";
@@ -115,6 +147,9 @@ namespace SenCom
             this.tbkComRevNum.Text = m_total_rcv.ToString();
 
             m_holding_reg = new HoldingReg(frame, rcv_len - 5);
+            UpdateChartDisplay(m_holding_reg);
+            UpdateChartDetect(m_holding_reg);
+            UpdateChartCFG(m_holding_reg);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
