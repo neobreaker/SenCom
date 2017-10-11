@@ -33,7 +33,6 @@ namespace SenCom.Model
             public int[] display;
             public UInt16 calibration_num;
             public int detect_calibration;
-             
         };
 
 
