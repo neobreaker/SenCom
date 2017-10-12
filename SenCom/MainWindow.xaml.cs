@@ -36,9 +36,11 @@ namespace SenCom
         private HoldingReg m_holding_reg = null;        
         private int m_display_idx = 0;               //display chart x
         private int m_detect_idx = 0;               // detect chart x
+        private bool m_is_com_opened = false;       //串口是否已打开
         private bool m_is_started = false;          //自动发送串口命令是否启动
-        private UInt64 m_total_snd_cnt = 0;
-        private UInt64 m_total_rcv_cnt = 0;
+        private UInt64 m_total_snd_cnt = 0;         //总计发送次数    命令除外
+        private UInt64 m_total_rcv_cnt = 0;         //总计接收次数    命令除外
+        private bool m_is_timeout = false;          //检测串口超时    主要用于命令超时检测
         private ObservableDataSource<Point> m_chart_display = new ObservableDataSource<Point>();
         private ObservableDataSource<Point> m_chart_detect = new ObservableDataSource<Point>();
         private ObservableDataSource<Point> m_chart_cfg = new ObservableDataSource<Point>();
@@ -99,7 +101,7 @@ namespace SenCom
             this.tbkComRevNum.Text = m_total_rcv.ToString();
 
             this.cpSensorDisplay.AddLineGraph(m_chart_display, Colors.Green);
-            this.cpSensorDetect.AddLineGraph(m_chart_display, Colors.Green);
+            this.cpSensorDetect.AddLineGraph(m_chart_detect, Colors.Green);
             this.cpSensorCfg.AddLineGraph(m_chart_cfg, Colors.Green);
         }
 
@@ -123,23 +125,34 @@ namespace SenCom
                         bytes_to_snd = m_snd_queue.Dequeue();
                         m_com.Write(bytes_to_snd, 0, bytes_to_snd.Length);
 
-                        if (m_is_started && bytes_to_snd[1] == Const.FUNC_READHOLDINGREG)
+                        if (m_is_started)
                         {
                             m_snd_queue.Enqueue(m_auto_snd);
-                            m_total_snd_cnt++;
                             m_tim_autosend.Interval = TimeSpan.FromSeconds(1);
                             m_tim_autosend.Start();
                         }
-                        this.tbkComSndCnt.Text = m_total_snd_cnt.ToString();
+
+                        switch(bytes_to_snd[1])
+                        {
+                        case Const.FUNC_READHOLDINGREG:
+                            m_total_snd_cnt++;
+                            this.tbkComSndCnt.Text = m_total_snd_cnt.ToString();
+                            break;
+                        case Const.FUNC_WRITEHOLDINGREG:
+                            if (bytes_to_snd[3] != 0x13)        //alter addr cmd doesn't has a response
+                                m_is_timeout = true;
+                            break;
+                        }
+
+                        m_tim_com.Stop();
+                        m_tim_com.Interval = 300;     // 300ms receive time out
+                        m_tim_com.Start();
                     }
                 }
-                m_tim_com.Stop();
-                m_tim_com.Interval = 300;     // 300ms receive time out
-                m_tim_com.Start();
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message);
             }
         }   
 
@@ -183,6 +196,8 @@ namespace SenCom
         {
             int i = 0;
             Point point;
+
+            m_chart_cfg.Collection.Clear();
 
             for (i = 0; i < hr.m_hold_reg.calibration_num; i++)
             {
@@ -260,6 +275,7 @@ namespace SenCom
                 rcv_len += rcv_buffer.Length;
                 
             }
+
             Util.HexToString(complete_frame, rcv_len, ref rcv_str);
             if (this.tbComData.Text.Length > 5 * 1024)
             {
@@ -294,15 +310,27 @@ namespace SenCom
                     }
                     break;
                 case Const.FUNC_WRITEHOLDINGREG:
-                    ;
+                    m_is_timeout = false;
+                    if(rcv_len == 8)
+                    {
+                        MessageBox.Show("写入成功");
+                    }
+                    else
+                    {
+                        MessageBox.Show("写入失败");
+                    }
                     break;
                 }
-                
+            }
+
+            if (m_is_timeout)
+            {
+                MessageBox.Show("写入超时");
+                m_is_timeout = false;
             }
 
             this.tbkComRevCnt.Text = m_total_rcv_cnt.ToString();
-            this.tbkComLostRate.Text = String.Format("{0:F2}%", (100.0)*(m_total_snd_cnt - m_total_rcv_cnt) / m_total_snd_cnt);
-
+            this.tbkComLostRate.Text = String.Format("{0:F2}%", (100.0) * (m_total_snd_cnt - m_total_rcv_cnt) / m_total_snd_cnt);
         }
 
         private void ResetStatics()
@@ -322,7 +350,20 @@ namespace SenCom
         {
             if (!m_com.IsOpen)
                 m_com.Open();
+            this.btnOpenOrClose.Content = "关闭串口";
+            m_is_com_opened = true;
+        }
 
+        private void CloseCom()
+        {
+            if (m_com.IsOpen)
+                m_com.Close();
+            this.btnOpenOrClose.Content = "打开串口";
+            m_is_com_opened = false;
+        }
+
+        private void StartAutoSnd()
+        {
             m_is_started = true;
             this.btnStartOrStop.Content = "Stop";
 
@@ -333,11 +374,8 @@ namespace SenCom
             m_snd_queue.Enqueue(m_auto_snd);
         }
 
-        private void CloseCom()
+        private void StopAutoSnd()
         {
-            if (m_com.IsOpen)
-                m_com.Close();
-
             m_is_started = false;
             this.btnStartOrStop.Content = "Start";
         }
@@ -346,23 +384,33 @@ namespace SenCom
         {
             try
             {
-                if (!m_is_started)
+                if (m_is_com_opened)
                 {
-                    OpenCom();
+                    if (!m_is_started)
+                    {
+                        StartAutoSnd();
+                    }
+                    else
+                    {
+                        StopAutoSnd();
+                    }
                 }
                 else
                 {
-                    CloseCom();
+                    MessageBox.Show("串口未打开");
                 }
+                
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show("无法打开串口,请检测此串口是否有效或被其他占用！");  
+                MessageBox.Show(ex.Message);
             }
+            
         }
 
         private void cbCom_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            StopAutoSnd();
             CloseCom();
             m_com.PortName = this.cbCom.SelectedValue.ToString();
             
@@ -370,6 +418,7 @@ namespace SenCom
 
         private void cbBaud_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            StopAutoSnd();
             CloseCom();
             m_com.BaudRate = Int32.Parse(this.cbBaud.SelectedValue.ToString());
         }
@@ -377,7 +426,7 @@ namespace SenCom
         private void cbAddr_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string str = "";
-            CloseCom();
+            StopAutoSnd();
 
             m_auto_snd[0] = Convert.ToByte(this.cbAddr.SelectedValue.ToString(), 10);
 
@@ -400,7 +449,7 @@ namespace SenCom
                 bytes_to_snd[len++] = Convert.ToByte(this.cbAddr.SelectedValue.ToString(), 10);     //slaver address
                 bytes_to_snd[len++] = Const.FUNC_WRITEHOLDINGREG;     //function code
                 bytes_to_snd[len++] = 0x00;
-                bytes_to_snd[len++] = 0x16;     // register idx  0x16+1
+                bytes_to_snd[len++] = 0x10;     // register idx  0x10+1
                 bytes_to_snd[len++] = 0x00;
                 bytes_to_snd[len++] = 0x01;     // one register
                 bytes_to_snd[len++] = 0x02;     // two byte
@@ -420,6 +469,51 @@ namespace SenCom
                 MessageBox.Show("报警数据无效");  
             }
             
+        }
+
+        private void btnOpenOrClose_Click(object sender, RoutedEventArgs e)
+        {
+            if (!m_is_com_opened)
+            {
+                OpenCom();
+            }
+            else
+            {
+                CloseCom(); 
+            }
+        }
+
+        private void btnModbusAddrSet_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] bytes_to_snd = new byte[11];
+            UInt16 len = 0, addr = 0;
+            short crc = 0;
+
+            try
+            {
+                addr = UInt16.Parse(this.tbModbusAddr.Text);
+                bytes_to_snd[len++] = Convert.ToByte(this.cbAddr.SelectedValue.ToString(), 10);     //slaver address
+                bytes_to_snd[len++] = Const.FUNC_WRITEHOLDINGREG;     //function code
+                bytes_to_snd[len++] = 0x00;
+                bytes_to_snd[len++] = 0x13;     // register idx  0x13+1
+                bytes_to_snd[len++] = 0x00;
+                bytes_to_snd[len++] = 0x01;     // one register
+                bytes_to_snd[len++] = 0x02;     // two byte
+                bytes_to_snd[len++] = (byte)((addr & 0xff00) >> 8);
+                bytes_to_snd[len++] = (byte)(addr & 0xff);
+
+                crc = Util.CRC16Modbus(bytes_to_snd, len);
+                Util.UpdateCRC16(bytes_to_snd, len, crc);
+
+                lock (m_snd_queue)
+                {
+                    m_snd_queue.Enqueue(bytes_to_snd);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("报警数据无效");
+            }
         }
 
     }
