@@ -251,30 +251,70 @@ namespace SenCom
             this.tbDetectValue2.Text = hr.m_hold_reg.sensor_detect2.ToString();
         }
 
+        private int DoFrame(byte[] frame, int frame_len)
+        {
+            byte[] data = new byte[1024];
+            int data_len = frame_len - 5;
+
+            if (frame_len <= 5)
+            {
+                return -1;
+            }
+            else
+            {
+                Array.Copy(frame, 3, data, 0, data_len);
+            }
+
+            if (Util.CRC16Modbus(frame, frame_len) == 0)
+            {
+                switch (frame[1])
+                {
+                    case Const.FUNC_READHOLDINGREG:
+                        if (frame_len == 107)
+                        {
+                            m_holding_reg = new HoldingReg(data, data_len);     //first 3 byte frame header and last 2 byte crc16
+
+                            UpdateChartDisplay(m_holding_reg);
+                            UpdateChartDetect(m_holding_reg);
+                            UpdateChartCFG(m_holding_reg);
+                            UpdateSensorInfo(m_holding_reg);
+                            UpdateSensorCalibration(m_holding_reg);
+                            UpdateSensorValue(m_holding_reg);
+
+                            m_total_rcv_cnt++;
+                        }
+                        break;
+                    case Const.FUNC_WRITEHOLDINGREG:
+                        m_is_timeout = false;
+                        if (frame_len == 8)
+                        {
+                            MessageBox.Show("写入成功");
+                        }
+                        else
+                        {
+                            MessageBox.Show("写入失败");
+                        }
+                        break;
+                }
+            }
+            return 0;
+        }
+
         private void UpdateUI()
         {
             int rcv_len = 0;
             string rcv_str = "";
             byte[] rcv_buffer = null;
-            byte[] incomplete_frame = new byte[1024];
             byte[] complete_frame = new byte[1024];
  
             while (m_com_queue.Count > 0)
             {
                 rcv_buffer = m_com_queue.Dequeue();
                 Array.Copy(rcv_buffer, 0, complete_frame, rcv_len, rcv_buffer.Length);
-
-                if (rcv_len == 0)
-                {
-                    Array.Copy(rcv_buffer, 3, incomplete_frame, 0, rcv_buffer.Length - 3);     // first 3 byte frame header
-                }
-                else
-                {
-                    Array.Copy(rcv_buffer, 0, incomplete_frame, rcv_len - 3, rcv_buffer.Length);
-                }
                 rcv_len += rcv_buffer.Length;
-                
             }
+
+            DoFrame(complete_frame, rcv_len);
 
             Util.HexToString(complete_frame, rcv_len, ref rcv_str);
             if (this.tbComData.Text.Length > 5 * 1024)
@@ -287,41 +327,7 @@ namespace SenCom
                 this.tbComData.Text += rcv_str;
                 m_total_rcv += rcv_len;
             }
-
             this.tbkComRevNum.Text = m_total_rcv.ToString();
-
-            if (Util.CRC16Modbus(complete_frame, rcv_len) == 0)
-            {
-                switch (complete_frame[1])
-                {
-                    case Const.FUNC_READHOLDINGREG:
-                    if (rcv_len == 107)
-                    {
-                        m_holding_reg = new HoldingReg(incomplete_frame, rcv_len - 5);     //first 3 byte frame header and last 2 byte crc16
-
-                        UpdateChartDisplay(m_holding_reg);
-                        UpdateChartDetect(m_holding_reg);
-                        UpdateChartCFG(m_holding_reg);
-                        UpdateSensorInfo(m_holding_reg);
-                        UpdateSensorCalibration(m_holding_reg);
-                        UpdateSensorValue(m_holding_reg);
-
-                        m_total_rcv_cnt++;
-                    }
-                    break;
-                case Const.FUNC_WRITEHOLDINGREG:
-                    m_is_timeout = false;
-                    if(rcv_len == 8)
-                    {
-                        MessageBox.Show("写入成功");
-                    }
-                    else
-                    {
-                        MessageBox.Show("写入失败");
-                    }
-                    break;
-                }
-            }
 
             if (m_is_timeout)
             {
@@ -348,18 +354,34 @@ namespace SenCom
 
         private void OpenCom()
         {
-            if (!m_com.IsOpen)
-                m_com.Open();
-            this.btnOpenOrClose.Content = "关闭串口";
-            m_is_com_opened = true;
+            try
+            {
+                if (!m_com.IsOpen)
+                    m_com.Open();
+                this.btnOpenOrClose.Content = "关闭串口";
+                m_is_com_opened = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            
         }
 
         private void CloseCom()
         {
-            if (m_com.IsOpen)
-                m_com.Close();
-            this.btnOpenOrClose.Content = "打开串口";
-            m_is_com_opened = false;
+            try
+            {
+                if (m_com.IsOpen)
+                    m_com.Close();
+                this.btnOpenOrClose.Content = "打开串口";
+                m_is_com_opened = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            
         }
 
         private void StartAutoSnd()
