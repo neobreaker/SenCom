@@ -20,6 +20,7 @@ using SenCom.Model;
 using Microsoft.Research.DynamicDataDisplay;
 using Microsoft.Research.DynamicDataDisplay.DataSources;
 using System.Runtime.InteropServices;
+using System.Configuration;
 
 namespace SenCom
 {
@@ -43,13 +44,16 @@ namespace SenCom
         private bool m_is_timeout = false;          //检测串口超时    主要用于命令超时检测
         private ObservableDataSource<Point> m_chart_display = new ObservableDataSource<Point>();
         private ObservableDataSource<Point> m_chart_detect = new ObservableDataSource<Point>();
+        private ObservableDataSource<Point> m_chart_detect2 = new ObservableDataSource<Point>();
         private ObservableDataSource<Point> m_chart_cfg = new ObservableDataSource<Point>();
+        private ObservableDataSource<Point> m_chart_cfg2 = new ObservableDataSource<Point>();
 
         private DispatcherTimer m_tim_autosend = null;        //自动发送串口命令定时器
 
         private string[] m_com_tbl =  { "COM1", "COM2", "COM3", "COM4" };
         private string[] m_baud_tbl = { "4800", "9600", "38400", "115200" };
         private string[] m_addr_tbl = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
+        private Dictionary<string, string> m_sensor_type = new Dictionary<string, string>();
 
         private byte[] m_auto_snd = { 0x03, 0x03, 0x00, 0x00, 0x00, 0x33, 0x04, 0x3d };
         private Queue<byte[]> m_snd_queue = new Queue<byte[]>();
@@ -57,6 +61,7 @@ namespace SenCom
         public MainWindow()
         {
             InitializeComponent();
+            
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -103,6 +108,9 @@ namespace SenCom
             this.cpSensorDisplay.AddLineGraph(m_chart_display, Colors.Green);
             this.cpSensorDetect.AddLineGraph(m_chart_detect, Colors.Green);
             this.cpSensorCfg.AddLineGraph(m_chart_cfg, Colors.Green);
+
+            this.cpSensorDetect.AddLineGraph(m_chart_detect2, Colors.Blue);
+            this.cpSensorCfg.AddLineGraph(m_chart_cfg2, Colors.Blue);
         }
 
         private void AutoSendTimerInit()
@@ -188,8 +196,16 @@ namespace SenCom
         private void UpdateChartDetect(HoldingReg hr)
         {
             Point point;
-            point = new Point(m_detect_idx++, hr.m_hold_reg.sensor_detect);
+            point = new Point(m_detect_idx, hr.m_hold_reg.sensor_detect);
             m_chart_detect.AppendAsync(base.Dispatcher, point);
+
+            if (hr != null && (hr.m_hold_reg.sensor_id == 1002))
+            {
+                point = new Point(m_detect_idx, hr.m_hold_reg.sensor_detect2);
+                m_chart_detect2.AppendAsync(base.Dispatcher, point);
+            }
+
+            m_detect_idx++;
         }
 
         private void UpdateChartCFG(HoldingReg hr)
@@ -198,19 +214,36 @@ namespace SenCom
             Point point;
 
             m_chart_cfg.Collection.Clear();
+            m_chart_cfg2.Collection.Clear();
 
-            for (i = 0; i < hr.m_hold_reg.calibration_num; i++)
+            if (hr.m_hold_reg.sensor_id == 1002)
             {
-                point = new Point(hr.m_hold_reg.detect[i], hr.m_hold_reg.display[i]);
-                m_chart_cfg.AppendAsync(base.Dispatcher, point);
+                for (i = 0; i < 4; i++)
+                {
+                    point = new Point(hr.m_hold_reg.detect[i], hr.m_hold_reg.display[i]);
+                    m_chart_cfg.AppendAsync(base.Dispatcher, point);
+                }
+
+                for (i = 4; i < 7; i++)
+                {
+                    point = new Point(hr.m_hold_reg.detect[i], hr.m_hold_reg.display[i]/10);
+                    m_chart_cfg2.AppendAsync(base.Dispatcher, point);
+                }
+            }
+            else
+            {
+                for (i = 0; i < hr.m_hold_reg.calibration_num; i++)
+                {
+                    point = new Point(hr.m_hold_reg.detect[i], hr.m_hold_reg.display[i]);
+                    m_chart_cfg.AppendAsync(base.Dispatcher, point);
+                }
             }
             
-
         }
 
         private void UpdateSensorInfo(HoldingReg hr)
         {
-            this.tbSensorType.Text = hr.m_hold_reg.sensor_id.ToString();
+            this.tbSensorType.Text = ConfigurationManager.AppSettings[hr.m_hold_reg.sensor_id.ToString()];
             this.tbSensorStatus.Text = hr.m_hold_reg.sensor_status.ToString();
             this.tbUpLimit.Text = hr.m_hold_reg.up_limit.ToString();
             this.tbLowLimit.Text = hr.m_hold_reg.low_limit.ToString();
@@ -349,6 +382,7 @@ namespace SenCom
             this.m_chart_display.Collection.Clear();
             this.m_chart_detect.Collection.Clear();
             this.m_chart_cfg.Collection.Clear();
+            this.m_chart_cfg2.Collection.Clear();
 
         }
 
