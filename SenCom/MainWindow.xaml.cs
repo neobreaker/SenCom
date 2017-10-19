@@ -17,6 +17,7 @@ using System.Timers;
 using System.Windows.Threading;
 using SenCom.Common;
 using SenCom.Model;
+using SenCom.Dialog;
 using Microsoft.Research.DynamicDataDisplay;
 using Microsoft.Research.DynamicDataDisplay.DataSources;
 using System.Runtime.InteropServices;
@@ -29,7 +30,7 @@ namespace SenCom
     /// </summary>
     public partial class MainWindow : Window
     {
-        private SerialPort m_com = new SerialPort();                    
+                         
         private Queue<byte[]> m_com_queue = new Queue<byte[]>();        //串口 不完整数据帧 缓存队列
         private int m_total_rcv = 0;                                // 接收数据总长度
         private Timer m_tim_com = null;                        //串口帧结束检测定时器
@@ -56,7 +57,7 @@ namespace SenCom
         private Dictionary<string, string> m_sensor_type = new Dictionary<string, string>();
 
         private byte[] m_auto_snd = { 0x03, 0x03, 0x00, 0x00, 0x00, 0x33, 0x04, 0x3d };
-        private Queue<byte[]> m_snd_queue = new Queue<byte[]>();
+ 
 
         public MainWindow()
         {
@@ -73,17 +74,16 @@ namespace SenCom
 
         private void SerialPortInit()
         {
+            SensorSerialPort.m_serialport.PortName = this.cbCom.SelectedValue.ToString();
+            SensorSerialPort.m_serialport.BaudRate = Int32.Parse(this.cbBaud.SelectedValue.ToString());
+            SensorSerialPort.m_serialport.Parity = Parity.None;
+            SensorSerialPort.m_serialport.DataBits = 8;
+            SensorSerialPort.m_serialport.StopBits = StopBits.One;
 
-            m_com.PortName = this.cbCom.SelectedValue.ToString();
-            m_com.BaudRate = Int32.Parse(this.cbBaud.SelectedValue.ToString());
-            m_com.Parity = Parity.None;
-            m_com.DataBits = 8;
-            m_com.StopBits = StopBits.One;
+            SensorSerialPort.m_serialport.ReadBufferSize = 1024;
+            SensorSerialPort.m_serialport.WriteBufferSize = 1024;
 
-            m_com.ReadBufferSize = 1024;
-            m_com.WriteBufferSize = 1024;
-
-            m_com.DataReceived += new SerialDataReceivedEventHandler(SerialPortReceive);
+            SensorSerialPort.m_serialport.DataReceived += new SerialDataReceivedEventHandler(SerialPortReceive);
 
             m_tim_com = new Timer();
             m_tim_com.Elapsed += new ElapsedEventHandler(ComTimedEvent);
@@ -126,16 +126,16 @@ namespace SenCom
 
             try
             {
-                lock (m_snd_queue)
+                lock (SensorSerialPort.m_snd_queue)
                 {
-                    if (m_snd_queue.Count > 0)
+                    if (SensorSerialPort.m_snd_queue.Count > 0)
                     {
-                        bytes_to_snd = m_snd_queue.Dequeue();
-                        m_com.Write(bytes_to_snd, 0, bytes_to_snd.Length);
+                        bytes_to_snd = SensorSerialPort.m_snd_queue.Dequeue();
+                        SensorSerialPort.m_serialport.Write(bytes_to_snd, 0, bytes_to_snd.Length);
 
                         if (m_is_started)
                         {
-                            m_snd_queue.Enqueue(m_auto_snd);
+                            SensorSerialPort.m_snd_queue.Enqueue(m_auto_snd);
                             m_tim_autosend.Interval = TimeSpan.FromSeconds(1);
                             m_tim_autosend.Start();
                         }
@@ -147,8 +147,7 @@ namespace SenCom
                             this.tbkComSndCnt.Text = m_total_snd_cnt.ToString();
                             break;
                         case Const.FUNC_WRITEHOLDINGREG:
-                            if (bytes_to_snd[3] != 0x13)        //alter addr cmd doesn't has a response
-                                m_is_timeout = true;
+                            m_is_timeout = true;
                             break;
                         }
 
@@ -168,8 +167,8 @@ namespace SenCom
         {
             byte[] rcv_buffer;
 
-            rcv_buffer = new byte[m_com.BytesToRead];
-            m_com.Read(rcv_buffer, 0, rcv_buffer.Length);
+            rcv_buffer = new byte[SensorSerialPort.m_serialport.BytesToRead];
+            SensorSerialPort.m_serialport.Read(rcv_buffer, 0, rcv_buffer.Length);
 
             m_com_queue.Enqueue(rcv_buffer);
 
@@ -390,8 +389,8 @@ namespace SenCom
         {
             try
             {
-                if (!m_com.IsOpen)
-                    m_com.Open();
+                if (!SensorSerialPort.m_serialport.IsOpen)
+                    SensorSerialPort.m_serialport.Open();
                 this.btnOpenOrClose.Content = "关闭串口";
                 m_is_com_opened = true;
             }
@@ -406,8 +405,8 @@ namespace SenCom
         {
             try
             {
-                if (m_com.IsOpen)
-                    m_com.Close();
+                if (SensorSerialPort.m_serialport.IsOpen)
+                    SensorSerialPort.m_serialport.Close();
                 this.btnOpenOrClose.Content = "打开串口";
                 m_is_com_opened = false;
             }
@@ -427,7 +426,7 @@ namespace SenCom
 
             m_tim_autosend.Interval = TimeSpan.FromSeconds(1);
             m_tim_autosend.Start();
-            m_snd_queue.Enqueue(m_auto_snd);
+            SensorSerialPort.m_snd_queue.Enqueue(m_auto_snd);
         }
 
         private void StopAutoSnd()
@@ -468,7 +467,7 @@ namespace SenCom
         {
             StopAutoSnd();
             CloseCom();
-            m_com.PortName = this.cbCom.SelectedValue.ToString();
+            SensorSerialPort.m_serialport.PortName = this.cbCom.SelectedValue.ToString();
             
         }
 
@@ -476,7 +475,7 @@ namespace SenCom
         {
             StopAutoSnd();
             CloseCom();
-            m_com.BaudRate = Int32.Parse(this.cbBaud.SelectedValue.ToString());
+            SensorSerialPort.m_serialport.BaudRate = Int32.Parse(this.cbBaud.SelectedValue.ToString());
         }
 
         private void cbAddr_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -515,9 +514,9 @@ namespace SenCom
                 crc = Util.CRC16Modbus(bytes_to_snd, len);
                 Util.UpdateCRC16(bytes_to_snd, len, crc);
 
-                lock (m_snd_queue)
+                lock (SensorSerialPort.m_snd_queue)
                 {
-                    m_snd_queue.Enqueue(bytes_to_snd);
+                    SensorSerialPort.m_snd_queue.Enqueue(bytes_to_snd);
                 }
             }
             catch (Exception ex)
@@ -561,15 +560,29 @@ namespace SenCom
                 crc = Util.CRC16Modbus(bytes_to_snd, len);
                 Util.UpdateCRC16(bytes_to_snd, len, crc);
 
-                lock (m_snd_queue)
+                lock (SensorSerialPort.m_snd_queue)
                 {
-                    m_snd_queue.Enqueue(bytes_to_snd);
+                    SensorSerialPort.m_snd_queue.Enqueue(bytes_to_snd);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("报警数据无效");
             }
+        }
+
+        private void btnCalibration_Click(object sender, RoutedEventArgs e)
+        {
+            if (SensorSerialPort.m_serialport.IsOpen)
+            {
+                WinCalibration winca = new WinCalibration(Convert.ToByte(this.cbAddr.SelectedValue.ToString(), 10));
+                winca.Show();
+            }
+            else
+            {
+                MessageBox.Show("串口未打开");
+            }
+            
         }
 
     }

@@ -141,7 +141,7 @@
                     </StackPanel>
                     <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
                         <Button Name="btnZero" Content="调零" Width="80" Height="40"  Margin="5, 5, 5, 5"/>
-                        <Button Name="btnCalibration" Content="校准" Width="80" Height="40"  Margin="5, 5, 5, 5"/>
+                        <Button Name="btnCalibration" Content="校准" Width="80" Height="40"  Margin="5, 5, 5, 5" Click="btnCalibration_Click" />
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">

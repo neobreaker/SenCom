@@ -59,6 +59,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Dialog\WinCalibration.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -69,7 +73,11 @@
     </Compile>
     <Compile Include="Common\Const.cs" />
     <Compile Include="Common\Endian.cs" />
+    <Compile Include="Common\SensorSerialPort.cs" />
     <Compile Include="Common\Util.cs" />
+    <Compile Include="Dialog\WinCalibration.xaml.cs">
+      <DependentUpon>WinCalibration.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

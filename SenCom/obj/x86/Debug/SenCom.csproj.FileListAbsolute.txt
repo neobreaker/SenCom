@@ -10,5 +10,6 @@ E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.Properties.Resources.resources
 E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.csproj.GenerateResource.Cache
 E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.exe
 E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.pdb
-E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.csprojResolveAssemblyReference.cache
 E:\github\SenCom\SenCom\bin\Debug\SenCom.exe.config
+E:\github\SenCom\SenCom\obj\x86\Debug\Dialog\WinCalibration.baml
+E:\github\SenCom\SenCom\obj\x86\Debug\Dialog\WinCalibration.g.cs
