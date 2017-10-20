@@ -23,7 +23,7 @@
         <TextBox Name="tbxDetect" Grid.Column="2" Grid.Row="2"></TextBox>
         <StackPanel Grid.Row="3" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Name="btnCalibration1" Content="低段校准"  Width="80" Margin="8" Click="btnCalibration1_Click"></Button>
-            <Button Name="btnCalibration2"  Content="高段校准" Width="80" Margin="8"></Button>
+            <Button Name="btnCalibration2"  Content="高段校准" Width="80" Margin="8" Click="btnCalibration2_Click"></Button>
         </StackPanel>
         <TextBlock Grid.ColumnSpan="4" Grid.Row="4" FontSize="12" Text="Tips: 高段校准只用于双量程高浓段校准" ></TextBlock>
         

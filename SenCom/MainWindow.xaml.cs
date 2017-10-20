@@ -126,35 +126,37 @@ namespace SenCom
 
             try
             {
-                lock (SensorSerialPort.m_snd_queue)
+                
+                if (SensorSerialPort.m_snd_queue.Count > 0)
                 {
-                    if (SensorSerialPort.m_snd_queue.Count > 0)
+                    lock (SensorSerialPort.m_snd_queue)
                     {
                         bytes_to_snd = SensorSerialPort.m_snd_queue.Dequeue();
-                        SensorSerialPort.m_serialport.Write(bytes_to_snd, 0, bytes_to_snd.Length);
 
-                        if (m_is_started)
+                        if (m_is_started && bytes_to_snd[1] == Const.FUNC_READHOLDINGREG) 
                         {
                             SensorSerialPort.m_snd_queue.Enqueue(m_auto_snd);
-                            m_tim_autosend.Interval = TimeSpan.FromSeconds(1);
-                            m_tim_autosend.Start();
+                            //m_tim_autosend.Interval = TimeSpan.FromSeconds(1);
+                            //m_tim_autosend.Start();
                         }
-
-                        switch(bytes_to_snd[1])
-                        {
-                        case Const.FUNC_READHOLDINGREG:
-                            m_total_snd_cnt++;
-                            this.tbkComSndCnt.Text = m_total_snd_cnt.ToString();
-                            break;
-                        case Const.FUNC_WRITEHOLDINGREG:
-                            m_is_timeout = true;
-                            break;
-                        }
-
-                        m_tim_com.Stop();
-                        m_tim_com.Interval = 300;     // 300ms receive time out
-                        m_tim_com.Start();
                     }
+                    SensorSerialPort.m_serialport.Write(bytes_to_snd, 0, bytes_to_snd.Length);
+
+                    switch(bytes_to_snd[1])
+                    {
+                    case Const.FUNC_READHOLDINGREG:
+                        m_total_snd_cnt++;
+                        this.tbkComSndCnt.Text = m_total_snd_cnt.ToString();
+                        break;
+                    case Const.FUNC_WRITEHOLDINGREG:
+                        m_is_timeout = true;
+                        break;
+                    }
+
+                    m_tim_com.Stop();
+                    m_tim_com.Interval = 300;     // 300ms receive time out
+                    m_tim_com.Start();
+                    
                 }
             }
             catch (Exception ex)
@@ -380,6 +382,7 @@ namespace SenCom
 
             this.m_chart_display.Collection.Clear();
             this.m_chart_detect.Collection.Clear();
+            this.m_chart_detect2.Collection.Clear();
             this.m_chart_cfg.Collection.Clear();
             this.m_chart_cfg2.Collection.Clear();
 

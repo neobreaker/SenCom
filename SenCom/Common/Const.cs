@@ -12,5 +12,6 @@ namespace SenCom.Common
         //modbus
         public const byte FUNC_READHOLDINGREG = 0x03;
         public const byte FUNC_WRITEHOLDINGREG = 0x10;
+        public const byte FUNC_WRITECOILREG = 0x05;
     }
 }

@@ -13,3 +13,4 @@ E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.pdb
 E:\github\SenCom\SenCom\bin\Debug\SenCom.exe.config
 E:\github\SenCom\SenCom\obj\x86\Debug\Dialog\WinCalibration.baml
 E:\github\SenCom\SenCom\obj\x86\Debug\Dialog\WinCalibration.g.cs
+E:\github\SenCom\SenCom\obj\x86\Debug\SenCom.csprojResolveAssemblyReference.cache
