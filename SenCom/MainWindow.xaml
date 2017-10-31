@@ -2,244 +2,251 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d3="http://research.microsoft.com/DynamicDataDisplay/1.0"
+        xmlns:avalon="http://schemas.xceed.com/wpf/xaml/avalondock"
         Title="传感器串口调试工具" Height="900" Width="1800" Loaded="Window_Loaded" WindowState="Maximized">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="30" />
-            <ColumnDefinition Width="1000" />
-            <ColumnDefinition Width="100" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="100"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="30"/>
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
-                <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0, 30, 0, 0">
-                        <TextBlock Text="串口号：" Width="75"/>
-                        <ComboBox Name="cbCom" Width="75" SelectionChanged="cbCom_SelectionChanged" />
-                    </StackPanel>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0, 10, 0, 0">
-                        <TextBlock Text="波特率：" Width="75"/>
-                        <ComboBox Name="cbBaud" Width="75" SelectionChanged="cbBaud_SelectionChanged" />
-                    </StackPanel>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0, 10, 0, 0">
-                        <TextBlock Text="传感器地址：" Width="75"/>
-                        <ComboBox Name="cbAddr" Width="75" SelectionChanged="cbAddr_SelectionChanged" />
-                    </StackPanel>
-                    <Button  Name="btnOpenOrClose" Content="打开串口" FontSize="15" Width="130" Height="40" Margin="0, 10, 0, 0" Click="btnOpenOrClose_Click" />
-                    <Button  Name="btnStartOrStop" Content="Start" FontSize="15" Width="130" Height="40" Margin="0, 10, 0, 0" Click="btnStartOrStop_Click" />
-                </StackPanel>
-                <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
-                    <StackPanel  Orientation="Horizontal" Margin="5, 30, 5, 5">
-                        <TextBlock Text="传感器类型：" Width="80" />
-                        <TextBlock Name="tbSensorType" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="传感器状态：" Width="80" />
-                        <TextBlock Name="tbSensorStatus"  />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="量程上限：" Width="80" />
-                        <TextBlock Name="tbUpLimit" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="量程下限：" Width="80" />
-                        <TextBlock Name="tbLowLimit" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="信号类型：" Width="80" />
-                        <TextBlock Name="tbSignalType" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="报警类型：" Width="80" />
-                        <TextBlock Name="tbWarnCompare"  />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="报警点：" Width="80" TextAlignment="Justify" />
-                        <TextBox Name="tbWarnThreshold" Width="120" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="通讯地址：" Width="80" />
-                        <TextBox Name="tbModbusAddr" Width="120"/>
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <Button Name="btnWarnSet" Content="设置报警" Width="80" Height="40"  Margin="5, 5, 5, 5" Click="btnWarnSet_Click" />
-                        <Button Name="btnModbusAddrSet" Content="设置地址" Width="80" Height="40"  Margin="5, 5, 5, 5" Click="btnModbusAddrSet_Click" />
-                    </StackPanel>
-                </StackPanel>
-                <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
-                    <StackPanel  Orientation="Horizontal" Margin="5, 30, 5, 5">
-                        <TextBlock Text="校准点1：" Width="80" />
-                        <TextBlock Name="tbDisplay1" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="校准点2：" Width="80" />
-                        <TextBlock Name="tbDisplay2" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="校准点3：" Width="80" />
-                        <TextBlock Name="tbDisplay3" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="校准点4：" Width="80" />
-                        <TextBlock Name="tbDisplay4" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="校准点5：" Width="80" />
-                        <TextBlock Name="tbDisplay5" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="校准点6：" Width="80" />
-                        <TextBlock Name="tbDisplay6" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="校准点7：" Width="80" />
-                        <TextBlock Name="tbDisplay7" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="精度校准：" Width="80" />
-                        <TextBlock Name="tbDetectCalibration" />
-                    </StackPanel>
-                </StackPanel>
-                <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
-                    <StackPanel  Orientation="Horizontal" Margin="5, 30, 5, 5">
-                        <TextBlock Text="采集点1：" Width="80" />
-                        <TextBlock Name="tbDetect1" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="采集点2：" Width="80" />
-                        <TextBlock Name="tbDetect2" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="采集点3：" Width="80" />
-                        <TextBlock Name="tbDetect3" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="采集点4：" Width="80" />
-                        <TextBlock Name="tbDetect4" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="采集点5：" Width="80" />
-                        <TextBlock Name="tbDetect5" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="采集点6：" Width="80" />
-                        <TextBlock Name="tbDetect6" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="采集点7：" Width="80" />
-                        <TextBlock Name="tbDetect7" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <TextBlock Text="校准数量：" Width="80" />
-                        <TextBlock Name="tbCalibrationNum" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
-                        <Button Name="btnZero" Content="调零" Width="80" Height="40"  Margin="5, 5, 5, 5"/>
-                        <Button Name="btnCalibration" Content="校准" Width="80" Height="40"  Margin="5, 5, 5, 5" Click="btnCalibration_Click" />
-                    </StackPanel>
-                </StackPanel>
-                <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
-                    <StackPanel  Orientation="Horizontal" Margin="5, 30, 5, 5">
-                        <TextBlock Text="传感器显示值：" Width="100" />
-                        <TextBlock Name="tbDisplayValue" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 10, 5, 5">
-                        <TextBlock Text="传感器采样值1：" Width="100" />
-                        <TextBlock Name="tbDetectValue1" />
-                    </StackPanel>
-                    <StackPanel  Orientation="Horizontal" Margin="5, 10, 5, 5">
-                        <TextBlock Text="传感器采样值2：" Width="100" />
-                        <TextBlock Name="tbDetectValue2" />
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
-            <GroupBox Grid.Row="2" Header="串口信息" BorderThickness="1" BorderBrush="Black" Padding="10,10,10,10" >
-                <StackPanel  Orientation="Vertical">
-                    <StackPanel  Orientation="Horizontal" Margin="5,5,5,5">
-                        <TextBlock Text="命令帧：" Width="80" />
-                        <TextBox Name="tbComCmd" IsReadOnly="True" />
-                    </StackPanel>
-                    <ScrollViewer Height="190" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="5,5,5,5">
-                        <TextBox Width="930"  Name="tbComData"  IsReadOnly="True" TextWrapping="Wrap" TextAlignment="Left" />
-                    </ScrollViewer>
-                    <StackPanel  Orientation="Horizontal" Margin="5,5,5,5">
-                        <TextBlock Text="接收：" Width="80" />
-                        <TextBlock Name="tbkComRevNum" Width="140"/>
-                        <TextBlock Text="发送次数：" Width="80" />
-                        <TextBlock Name="tbkComSndCnt" Width="140"/>
-                        <TextBlock Text="接收次数：" Width="80" />
-                        <TextBlock Name="tbkComRevCnt" Width="140"/>
-                        <TextBlock Text="丢包率：" Width="80" />
-                        <TextBlock Name="tbkComLostRate" Width="140"/>
-                    </StackPanel>
-                </StackPanel>
-            </GroupBox>
-        </Grid>
-        <Grid Grid.Column="3">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="280"/>
-                <RowDefinition Height="280"/>
-                <RowDefinition Height="280"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="传感器实时显示值" Margin="20,10,0,0"
-                       FontSize="15" FontWeight="Bold"/>
-                    <TextBlock x:Name="tbSensorDisplay" Margin="10,10,0,0"
-                       FontSize="15"/>
-                </StackPanel>
-                <d3:ChartPlotter x:Name="cpSensorDisplay" Margin="10,10,20,10" Height="200">
-                    <d3:ChartPlotter.VerticalAxis>
-                        <d3:VerticalIntegerAxis />
-                    </d3:ChartPlotter.VerticalAxis>
+        <avalon:DockingManager Grid.Column="1">
+            <avalon:LayoutRoot>
+                <avalon:LayoutPanel Orientation="Horizontal" >
+                    <avalon:LayoutDocumentPane DockWidth="300" >
+                        <avalon:LayoutAnchorable Title="Simple tool panel">
+                            <Grid Margin="10 0 0 0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="100"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0, 30, 0, 0">
+                                            <TextBlock Text="串口号：" Width="75"/>
+                                            <ComboBox Name="cbCom" Width="75" SelectionChanged="cbCom_SelectionChanged" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0, 10, 0, 0">
+                                            <TextBlock Text="波特率：" Width="75"/>
+                                            <ComboBox Name="cbBaud" Width="75" SelectionChanged="cbBaud_SelectionChanged" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0, 10, 0, 0">
+                                            <TextBlock Text="传感器地址：" Width="75"/>
+                                            <ComboBox Name="cbAddr" Width="75" SelectionChanged="cbAddr_SelectionChanged" />
+                                        </StackPanel>
+                                        <Button  Name="btnOpenOrClose" Content="打开串口" FontSize="15" Width="130" Height="40" Margin="0, 10, 0, 0" Click="btnOpenOrClose_Click" />
+                                        <Button  Name="btnStartOrStop" Content="Start" FontSize="15" Width="130" Height="40" Margin="0, 10, 0, 0" Click="btnStartOrStop_Click" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 30, 5, 5">
+                                            <TextBlock Text="传感器类型：" Width="80" />
+                                            <TextBlock Name="tbSensorType" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="传感器状态：" Width="80" />
+                                            <TextBlock Name="tbSensorStatus"  />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="量程上限：" Width="80" />
+                                            <TextBlock Name="tbUpLimit" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="量程下限：" Width="80" />
+                                            <TextBlock Name="tbLowLimit" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="信号类型：" Width="80" />
+                                            <TextBlock Name="tbSignalType" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="报警类型：" Width="80" />
+                                            <TextBlock Name="tbWarnCompare"  />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="报警点：" Width="80" TextAlignment="Justify" />
+                                            <TextBox Name="tbWarnThreshold" Width="120" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="通讯地址：" Width="80" />
+                                            <TextBox Name="tbModbusAddr" Width="120"/>
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <Button Name="btnWarnSet" Content="设置报警" Width="80" Height="40"  Margin="5, 5, 5, 5" Click="btnWarnSet_Click" />
+                                            <Button Name="btnModbusAddrSet" Content="设置地址" Width="80" Height="40"  Margin="5, 5, 5, 5" Click="btnModbusAddrSet_Click" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 30, 5, 5">
+                                            <TextBlock Text="校准点1：" Width="80" />
+                                            <TextBlock Name="tbDisplay1" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="校准点2：" Width="80" />
+                                            <TextBlock Name="tbDisplay2" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="校准点3：" Width="80" />
+                                            <TextBlock Name="tbDisplay3" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="校准点4：" Width="80" />
+                                            <TextBlock Name="tbDisplay4" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="校准点5：" Width="80" />
+                                            <TextBlock Name="tbDisplay5" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="校准点6：" Width="80" />
+                                            <TextBlock Name="tbDisplay6" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="校准点7：" Width="80" />
+                                            <TextBlock Name="tbDisplay7" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="精度校准：" Width="80" />
+                                            <TextBlock Name="tbDetectCalibration" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 30, 5, 5">
+                                            <TextBlock Text="采集点1：" Width="80" />
+                                            <TextBlock Name="tbDetect1" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="采集点2：" Width="80" />
+                                            <TextBlock Name="tbDetect2" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="采集点3：" Width="80" />
+                                            <TextBlock Name="tbDetect3" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="采集点4：" Width="80" />
+                                            <TextBlock Name="tbDetect4" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="采集点5：" Width="80" />
+                                            <TextBlock Name="tbDetect5" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="采集点6：" Width="80" />
+                                            <TextBlock Name="tbDetect6" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="采集点7：" Width="80" />
+                                            <TextBlock Name="tbDetect7" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <TextBlock Text="校准数量：" Width="80" />
+                                            <TextBlock Name="tbCalibrationNum" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 5, 5, 5">
+                                            <Button Name="btnZero" Content="调零" Width="80" Height="40"  Margin="5, 5, 5, 5" Click="btnZero_Click" />
+                                            <Button Name="btnCalibration" Content="校准" Width="80" Height="40"  Margin="5, 5, 5, 5" Click="btnCalibration_Click" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Orientation="Vertical" Width="200">
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 30, 5, 5">
+                                            <TextBlock Text="传感器显示值：" Width="100" />
+                                            <TextBlock Name="tbDisplayValue" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 10, 5, 5">
+                                            <TextBlock Text="传感器采样值1：" Width="100" />
+                                            <TextBlock Name="tbDetectValue1" />
+                                        </StackPanel>
+                                        <StackPanel  Orientation="Horizontal" Margin="5, 10, 5, 5">
+                                            <TextBlock Text="传感器采样值2：" Width="100" />
+                                            <TextBlock Name="tbDetectValue2" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                                <GroupBox Grid.Row="2" Width="1000" HorizontalAlignment="Left" Header="串口信息" BorderThickness="1" BorderBrush="Black" Padding="10,10,10,10" >
+                                    <StackPanel  Orientation="Vertical">
+                                        <StackPanel  Orientation="Horizontal" Margin="5,5,5,5">
+                                            <TextBlock Text="命令帧：" Width="80" />
+                                            <TextBox Name="tbComCmd" IsReadOnly="True" />
+                                        </StackPanel>
+                                        <ScrollViewer Height="190" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="5,5,5,5">
+                                            <TextBox Width="930"  Name="tbComData"  IsReadOnly="True" TextWrapping="Wrap" TextAlignment="Left" />
+                                        </ScrollViewer>
+                                        <StackPanel  Orientation="Horizontal" Margin="5,5,5,5">
+                                            <TextBlock Text="接收：" Width="80" />
+                                            <TextBlock Name="tbkComRevNum" Width="140"/>
+                                            <TextBlock Text="发送次数：" Width="80" />
+                                            <TextBlock Name="tbkComSndCnt" Width="140"/>
+                                            <TextBlock Text="接收次数：" Width="80" />
+                                            <TextBlock Name="tbkComRevCnt" Width="140"/>
+                                            <TextBlock Text="丢包率：" Width="80" />
+                                            <TextBlock Name="tbkComLostRate" Width="140"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </GroupBox>
+                            </Grid>
+                        </avalon:LayoutAnchorable>
+                    </avalon:LayoutDocumentPane>
+                </avalon:LayoutPanel>
+                <avalon:LayoutRoot.RightSide>
+                    <avalon:LayoutAnchorSide>
+                        <avalon:LayoutAnchorGroup>
+                            <avalon:LayoutAnchorable  Title="Autohidden Content">
+                                <Grid Grid.Column="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="280"/>
+                                        <RowDefinition Height="280"/>
+                                        <RowDefinition Height="280"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" Orientation="Vertical">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="传感器实时显示值" Margin="20,10,0,0" FontSize="15" FontWeight="Bold"/>
+                                            <TextBlock x:Name="tbSensorDisplay" Margin="10,10,0,0"  FontSize="15"/>
+                                        </StackPanel>
+                                        <d3:ChartPlotter x:Name="cpSensorDisplay" Margin="10,10,20,10" Height="200">
+                                            <d3:ChartPlotter.VerticalAxis>
+                                                <d3:VerticalIntegerAxis />
+                                            </d3:ChartPlotter.VerticalAxis>
 
-                    <d3:ChartPlotter.HorizontalAxis>
-                        <d3:HorizontalIntegerAxis />
-                    </d3:ChartPlotter.HorizontalAxis>
+                                            <d3:ChartPlotter.HorizontalAxis>
+                                                <d3:HorizontalIntegerAxis />
+                                            </d3:ChartPlotter.HorizontalAxis>
 
-                </d3:ChartPlotter>
-            </StackPanel>
-            <StackPanel Grid.Row="1" Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="传感器实时采样值" Margin="20,10,0,0"
-                       FontSize="15" FontWeight="Bold"/>
-                    <TextBlock x:Name="tbSensorDetect" Margin="10,10,0,0"
-                       FontSize="15"/>
-                </StackPanel>
-                <d3:ChartPlotter x:Name="cpSensorDetect" Margin="10,10,20,10" Height="200">
-                    <d3:ChartPlotter.VerticalAxis>
-                        <d3:VerticalIntegerAxis />
-                    </d3:ChartPlotter.VerticalAxis>
+                                        </d3:ChartPlotter>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Orientation="Vertical">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="传感器实时采样值" Margin="20,10,0,0" FontSize="15" FontWeight="Bold"/>
+                                            <TextBlock x:Name="tbSensorDetect" Margin="10,10,0,0" FontSize="15"/>
+                                        </StackPanel>
+                                        <d3:ChartPlotter x:Name="cpSensorDetect" Margin="10,10,20,10" Height="200">
+                                            <d3:ChartPlotter.VerticalAxis>
+                                                <d3:VerticalIntegerAxis />
+                                            </d3:ChartPlotter.VerticalAxis>
 
-                    <d3:ChartPlotter.HorizontalAxis>
-                        <d3:HorizontalIntegerAxis />
-                    </d3:ChartPlotter.HorizontalAxis>
-                </d3:ChartPlotter>
-            </StackPanel>
-            <StackPanel Grid.Row="2" Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="传感器校准曲线" Margin="20,10,0,0"
-                       FontSize="15" FontWeight="Bold"/>
-                    <TextBlock x:Name="tbSensorCfg" Margin="10,10,0,0"
-                       FontSize="15"/>
-                </StackPanel>
-                <d3:ChartPlotter x:Name="cpSensorCfg" Margin="10,10,20,10" Height="200">
-                    <d3:ChartPlotter.VerticalAxis>
-                        <d3:VerticalIntegerAxis />
-                    </d3:ChartPlotter.VerticalAxis>
+                                            <d3:ChartPlotter.HorizontalAxis>
+                                                <d3:HorizontalIntegerAxis />
+                                            </d3:ChartPlotter.HorizontalAxis>
+                                        </d3:ChartPlotter>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Orientation="Vertical">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="传感器校准曲线" Margin="20,10,0,0" FontSize="15" FontWeight="Bold"/>
+                                            <TextBlock x:Name="tbSensorCfg" Margin="10,10,0,0" FontSize="15"/>
+                                        </StackPanel>
+                                        <d3:ChartPlotter x:Name="cpSensorCfg" Margin="10,10,20,10" Height="200">
+                                            <d3:ChartPlotter.VerticalAxis>
+                                                <d3:VerticalIntegerAxis />
+                                            </d3:ChartPlotter.VerticalAxis>
 
-                    <d3:ChartPlotter.HorizontalAxis>
-                        <d3:HorizontalIntegerAxis />
-                    </d3:ChartPlotter.HorizontalAxis>
-                </d3:ChartPlotter>
-            </StackPanel>
-        </Grid>
+                                            <d3:ChartPlotter.HorizontalAxis>
+                                                <d3:HorizontalIntegerAxis />
+                                            </d3:ChartPlotter.HorizontalAxis>
+                                        </d3:ChartPlotter>
+                                    </StackPanel>
+                                </Grid>
+                            </avalon:LayoutAnchorable>
+                        </avalon:LayoutAnchorGroup>
+                    </avalon:LayoutAnchorSide>
+                </avalon:LayoutRoot.RightSide>
+            </avalon:LayoutRoot>
+        </avalon:DockingManager>
     </Grid>
 </Window>

@@ -588,5 +588,10 @@ namespace SenCom
             
         }
 
+        private void btnZero_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
     }
 }
