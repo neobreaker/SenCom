@@ -51,7 +51,7 @@ namespace SenCom
 
         private DispatcherTimer m_tim_autosend = null;        //自动发送串口命令定时器
 
-        private string[] m_com_tbl =  { "COM1", "COM2", "COM3", "COM4" };
+        private string[] m_com_tbl =  { "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8" };
         private string[] m_baud_tbl = { "4800", "9600", "38400", "115200" };
         private string[] m_addr_tbl = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
         private Dictionary<string, string> m_sensor_type = new Dictionary<string, string>();
