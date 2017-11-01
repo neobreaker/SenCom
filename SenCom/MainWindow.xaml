@@ -10,7 +10,7 @@
                 <avalon:LayoutPanel Orientation="Horizontal" >
                     <avalon:LayoutDocumentPane DockWidth="300" >
                         <avalon:LayoutAnchorable Title="Simple tool panel">
-                            <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="5,5,5,5">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="5,5,5,5">
                                 <Grid Margin="10 0 0 0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="auto"/>
