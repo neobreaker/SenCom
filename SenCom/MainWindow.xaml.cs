@@ -412,6 +412,11 @@ namespace SenCom
                     SensorSerialPort.m_serialport.Close();
                 this.btnOpenOrClose.Content = "打开串口";
                 m_is_com_opened = false;
+
+                if (m_is_started == true)
+                {
+                    StopAutoSnd();
+                }
             }
             catch (Exception ex)
             {
